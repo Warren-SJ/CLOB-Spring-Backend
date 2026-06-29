@@ -1,11 +1,7 @@
 package com.warren.clob.repos;
 
 import com.warren.clob.models.User;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public interface UserRepo extends CrudRepository<User,Integer> {
-    void addUser(User user);
-    void deleteById(long id);
+public interface UserRepo extends JpaRepository<User, Long> {
 }

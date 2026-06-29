@@ -1,9 +1,6 @@
 package com.warren.clob.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,16 +12,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
-    private long id;
+    private Long id;
     @Column(name="name")
     private String name;
     @Column(name="contact")
     private String contact;
     @Column(name="email")
     private String email;
+    @Column(name="address")
+    private String address;
     @Column(name="cash")
-    private int cash;
+    private Integer cash;
     @Column(name="buying_power")
-    private int buyingPower;
+    private Integer buyingPower;
 }

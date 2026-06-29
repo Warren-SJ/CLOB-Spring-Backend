@@ -18,17 +18,17 @@ import java.time.LocalDateTime;
 public class Transaction {
     @Id
     @Column(name="id")
-    private long id;
+    private Long id;
     @Column(name="buyer")
-    private long buyerId;
+    private Long buyerId;
     @Column(name="seller")
-    private long sellerId;
+    private Long sellerId;
     @Column(name="price")
-    private int price;
+    private Integer price;
     @Column(name="quantity")
-    private int quantity;
+    private Integer quantity;
     @Column(name="ticker")
-    private long ticker;
+    private Long ticker;
     @Column(name="timestamp")
     private LocalDateTime timestamp;
 }

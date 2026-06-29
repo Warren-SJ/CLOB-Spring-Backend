@@ -18,17 +18,17 @@ import java.time.LocalDateTime;
 public class Order {
     @Id
     @Column(name="id")
-    private long id;
+    private Long id;
     @Column(name="client")
-    private long clientId;
+    private Long clientId;
     @Column(name="price")
-    private int price;
+    private Integer price;
     @Column(name="original_quantity")
-    private int originalQuantity;
+    private Integer originalQuantity;
     @Column(name="ticker")
-    private long ticker;
+    private Long ticker;
     @Column(name="remaining_quantity")
-    private long remainingQuantity;
+    private Long remainingQuantity;
     @Column(name="status")
     private char status;
     @Column(name="type")
