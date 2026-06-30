@@ -1,9 +1,6 @@
 package com.warren.clob.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +15,7 @@ import java.time.LocalDateTime;
 public class Order {
     @Id
     @Column(name="id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name="client")
     private Long clientId;
@@ -30,9 +28,9 @@ public class Order {
     @Column(name="remaining_quantity")
     private Long remainingQuantity;
     @Column(name="status")
-    private char status;
+    private Character status;
     @Column(name="type")
-    private char type;
+    private Character side;
     @Column(name="timestamp")
     private LocalDateTime timestamp;
 }
