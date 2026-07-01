@@ -27,7 +27,29 @@ public class UserService {
         return user;
     }
 
-    void deleteById(long id) {
-        userRepo.deleteById(id);
+    public Integer findBuyingPowerById(Long id) {
+        User user = userRepo.findById(id).orElse(null);
+        return user != null ? user.getBuyingPower() : null;
+    }
+
+    public User findById(long id) {
+        return userRepo.findById(id).orElse(null);
+    }
+
+    public void save(User existingUser) {
+        userRepo.save(existingUser);
+    }
+
+    public void addCash(Long userId, int amount) {
+        User user = userRepo.findById(userId).orElse(null);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        user.setCash(user.getCash() + amount);
+        user.setBuyingPower(user.getBuyingPower() + amount);
+        userRepo.save(user);
     }
 }
