@@ -87,8 +87,9 @@ public class OrderService {
             throw new IllegalArgumentException("Order not found");
         }
         int buyingPower = userService.findBuyingPowerById(existingOrder.getClientId());
+        long existingRemainingQty = (existingOrder.getRemainingQuantity() != null) ? existingOrder.getRemainingQuantity() : existingOrder.getOriginalQuantity();
         if (existingOrder.getSide() == 'B' &&
-                buyingPower - (order.getPrice() * order.getOriginalQuantity()) + (existingOrder.getPrice() * existingOrder.getOriginalQuantity()) < 0) {
+                buyingPower - ((long) order.getPrice() * order.getOriginalQuantity()) + (existingOrder.getPrice() * existingRemainingQty) < 0) {
             throw new IllegalArgumentException("Insufficient buying power");
         }
         try {
@@ -114,7 +115,7 @@ public class OrderService {
                 if(existingOrder.getSide() == 'B') {
                     User existingUser = userService.findById(existingOrder.getClientId());
                     existingUser.setBuyingPower(existingUser.getBuyingPower() - (order.getPrice() * order.getOriginalQuantity()));
-                    existingUser.setBuyingPower(existingUser.getBuyingPower() + (existingOrder.getPrice() * existingOrder.getOriginalQuantity()));
+                    existingUser.setBuyingPower(existingUser.getBuyingPower() + (int)(existingOrder.getPrice() * existingRemainingQty));
                     userService.save(existingUser);
                 }
             }
@@ -142,7 +143,8 @@ public class OrderService {
             if (response.statusCode() == 200) {
                 if (order.getSide() == 'B') {
                     User existingUser = userService.findById(order.getClientId());
-                    existingUser.setBuyingPower(existingUser.getBuyingPower() + order.getPrice() * order.getOriginalQuantity());
+                    long remainingQty = (order.getRemainingQuantity() != null) ? order.getRemainingQuantity() : order.getOriginalQuantity();
+                    existingUser.setBuyingPower(existingUser.getBuyingPower() + (int)(order.getPrice() * remainingQty));
                     userService.save(existingUser);
                 }
             }
