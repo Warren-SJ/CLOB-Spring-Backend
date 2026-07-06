@@ -45,10 +45,22 @@ public class OrderService {
                 || order.getSide() == '\0') {
             throw new IllegalArgumentException("Order must include ticker, clientId, side, price, and originalQuantity");
         }
+        char side = Character.toUpperCase(order.getSide());
+        if (side != 'B' && side != 'S') {
+            throw new IllegalArgumentException("Side must be 'B' or 'S'");
+        }
         if(order.getPrice() <= 0 || order.getOriginalQuantity() <= 0) {
             throw new IllegalArgumentException("Price and Quantity must be positive");
         }
-        if(order.getSide() == 'B') {
+        User existingUser = userService.findById(order.getClientId());
+        if (existingUser == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+        long totalRequired = (long) order.getPrice() * order.getOriginalQuantity();
+        if (totalRequired > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Order total cost exceeds maximum allowable limit");
+        }
+        if(side == 'B') {
             int buyingPower = userService.findBuyingPowerById(order.getClientId());
             if (order.getPrice() * order.getOriginalQuantity() > buyingPower) {
                 throw new IllegalArgumentException("Insufficient buying power");
@@ -57,7 +69,6 @@ public class OrderService {
 
         try {
             if (order.getSide() == 'B') {
-                User existingUser = userService.findById(order.getClientId());
                 existingUser.setBuyingPower(existingUser.getBuyingPower() - (order.getPrice() * order.getOriginalQuantity()));
                 userService.save(existingUser);
             }
@@ -122,14 +133,23 @@ public class OrderService {
             throw new IllegalArgumentException("Order not found");
         }
         int buyingPower = userService.findBuyingPowerById(existingOrder.getClientId());
+        User existingUser = userService.findById(existingOrder.getClientId());
+        if (existingUser == null) {
+            throw new IllegalArgumentException("User not found");
+        }
         long existingRemainingQty = (existingOrder.getRemainingQuantity() != null) ? existingOrder.getRemainingQuantity() : existingOrder.getOriginalQuantity();
         if (existingOrder.getSide() == 'B' &&
                 buyingPower - ((long) order.getPrice() * order.getOriginalQuantity()) + (existingOrder.getPrice() * existingRemainingQty) < 0) {
             throw new IllegalArgumentException("Insufficient buying power");
         }
+        long newLock = (long) order.getPrice() * order.getOriginalQuantity();
+        long oldLock = (long) existingOrder.getPrice() * existingRemainingQty;
+
+        if (newLock > Integer.MAX_VALUE || oldLock > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Order cost exceeds maximum allowable limit");
+        }
         try {
             if(existingOrder.getSide() == 'B') {
-                User existingUser = userService.findById(existingOrder.getClientId());
                 existingUser.setBuyingPower(existingUser.getBuyingPower() - (order.getPrice() * order.getOriginalQuantity()));
                 existingUser.setBuyingPower(existingUser.getBuyingPower() + (int)(existingOrder.getPrice() * existingRemainingQty));
                 userService.save(existingUser);
@@ -186,11 +206,19 @@ public class OrderService {
         if (order == null) {
             throw new IllegalArgumentException("Order not found");
         }
-        try {
 
+        try {
             if (order.getSide() == 'B') {
                 User existingUser = userService.findById(order.getClientId());
+                if (existingUser == null) {
+                    throw new IllegalArgumentException("User not found");
+                }
                 long remainingQty = (order.getRemainingQuantity() != null) ? order.getRemainingQuantity() : order.getOriginalQuantity();
+                long refundAmount = (long) order.getPrice() * remainingQty;
+                long newBuyingPower = (long) existingUser.getBuyingPower() + refundAmount;
+                if (newBuyingPower > Integer.MAX_VALUE) {
+                    throw new IllegalArgumentException("Refund would exceed maximum buying power");
+                }
                 existingUser.setBuyingPower(existingUser.getBuyingPower() + (int)(order.getPrice() * remainingQty));
                 userService.save(existingUser);
             }
