@@ -81,7 +81,6 @@ public class OrderService {
                     .price(order.getPrice())
                     .quantity(order.getOriginalQuantity())
                     .build();
-
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {

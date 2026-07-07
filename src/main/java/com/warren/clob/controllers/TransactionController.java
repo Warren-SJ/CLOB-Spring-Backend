@@ -1,6 +1,5 @@
 package com.warren.clob.controllers;
 
-import com.warren.clob.dto.DeductCash;
 import com.warren.clob.models.Transaction;
 import com.warren.clob.services.TransactionService;
 import lombok.AllArgsConstructor;
@@ -18,8 +17,8 @@ public class TransactionController {
         return transactionService.getTransactionsByClientId(clientId, clientId);
     }
 
-    @PostMapping("api/transaction/execute")
-    public void executeTransaction(@RequestBody DeductCash deductCash) {
-        transactionService.executeTransaction(deductCash);
-    }
+//    @PostMapping("api/transaction/execute")
+//    public void executeTransaction(@RequestBody DeductCash deductCash) {
+//        transactionService.executeTransaction(deductCash);
+//    }
 }
