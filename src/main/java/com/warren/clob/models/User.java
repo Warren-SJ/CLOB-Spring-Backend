@@ -27,4 +27,6 @@ public class User {
     private Integer cash;
     @Column(name="buying_power")
     private Integer buyingPower;
+    @Column(name="password")
+    private String password;
 }
