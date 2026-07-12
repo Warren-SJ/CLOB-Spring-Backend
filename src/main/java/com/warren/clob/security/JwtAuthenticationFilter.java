@@ -27,8 +27,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private @Nullable String getJwtFromRequest(HttpServletRequest request){
         String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+        if (!StringUtils.hasText(bearerToken)) {
+            bearerToken = request.getHeader("authorization");
+        }
+        if (StringUtils.hasText(bearerToken)) {
+            if (bearerToken.regionMatches(true, 0, "Bearer ", 0, 7)) {
+                return bearerToken.substring(7).trim();
+            }
         }
         return null;
     }
@@ -36,12 +41,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String jwt = getJwtFromRequest(request);
-            if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
-                String email = jwtTokenProvider.getEmailFromToken(jwt);
-                UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (StringUtils.hasText(jwt)) {
+                if (jwtTokenProvider.validateToken(jwt)) {
+                    String email = jwtTokenProvider.getEmailFromToken(jwt);
+                    UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    logger.warn("JWT validation failed for token: " + jwt);
+                }
             }
         } catch (Exception e) {
             logger.error("Error occurred while setting authentication", e);

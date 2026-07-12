@@ -3,7 +3,6 @@ package com.warren.clob.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -22,8 +21,7 @@ public class JwtTokenProvider {
     private Long jwtExpiration;
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return  Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
     public String generateToken(String email, Long userId){

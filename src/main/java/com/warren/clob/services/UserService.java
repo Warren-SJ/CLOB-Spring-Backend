@@ -5,6 +5,8 @@ import com.warren.clob.repos.UserRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @AllArgsConstructor
 public class UserService {
@@ -36,6 +38,9 @@ public class UserService {
         return userRepo.findById(id).orElse(null);
     }
 
+    public Optional<User> findByEmail(String email) {
+        return userRepo.findByEmail(email);
+    }
     public void save(User existingUser) {
         userRepo.save(existingUser);
     }

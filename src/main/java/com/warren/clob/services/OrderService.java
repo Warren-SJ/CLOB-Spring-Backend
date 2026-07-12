@@ -256,4 +256,8 @@ public class OrderService {
             throw new IllegalStateException("Failed to forward order to matching engine", e);
         }
     }
+
+    public Order getOrderById(Long id) {
+        return orderRepo.findById(id).orElse(null);
+    }
 }
